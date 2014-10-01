@@ -97,6 +97,10 @@ void init() {
   rightCum2 = SensorValue[sensRight];
 }
 
+void waitIdle(){
+  while(nMotorRunState[motorB] != runStateIdle || nMotorRunState[motorC] != runStateIdle ){}
+}
+
 void printInt(word n)
 {
 	string s;
@@ -104,6 +108,67 @@ void printInt(word n)
 	nxtDisplayTextLine(1,s);
 }
 
+void turnInstant(int angle){
+
+    switch (angle)
+  {
+  case 90:
+  	  int a = 240;
+    	nMotorEncoder[motorB] = 0;
+    	nMotorEncoder[motorC] = 0;
+
+      nMotorEncoderTarget[motorB] = a;
+    	nMotorEncoderTarget[motorC] = a;
+    	motor[motorB] = -100;
+      motor[motorC] = 100;
+      waitIdle();
+      nxtDisplayString(1, "%d", nMotorEncoder[motorB]);
+      nxtDisplayString(2, "%d", nMotorEncoder[motorC]);
+      break;
+  case 0:
+       int c = 100;
+     nMotorEncoder[motorB] = 0;
+    	nMotorEncoder[motorC] = 0;
+
+      nMotorEncoderTarget[motorB] = c;
+    	nMotorEncoderTarget[motorC] = c;
+    	motor[motorB] = 100;
+      motor[motorC] = 100;
+      waitIdle();
+      nxtDisplayString(1, "%d", nMotorEncoder[motorB]);
+      nxtDisplayString(2, "%d", nMotorEncoder[motorC]);
+      break;
+  case 180:
+      int b = 470;
+     nMotorEncoder[motorB] = 0;
+    	nMotorEncoder[motorC] = 0;
+
+      nMotorEncoderTarget[motorB] = b;
+    	nMotorEncoderTarget[motorC] = b;
+    	motor[motorB] = -100;
+      motor[motorC] = 100;
+      waitIdle();
+      nxtDisplayString(1, "%d", nMotorEncoder[motorB]);
+      nxtDisplayString(2, "%d", nMotorEncoder[motorC]);
+      break;
+
+  case -90:
+  	  int d = 240;
+    	nMotorEncoder[motorB] = 0;
+    	nMotorEncoder[motorC] = 0;
+
+      nMotorEncoderTarget[motorB] = d;
+    	nMotorEncoderTarget[motorC] = d;
+    	motor[motorB] = 100;
+      motor[motorC] = -100;
+      waitIdle();
+      nxtDisplayString(1, "%d", nMotorEncoder[motorB]);
+      nxtDisplayString(2, "%d", nMotorEncoder[motorC]);
+      break;
+    default:
+      //nothing here
+  }
+}
 
 task main()
 {
@@ -122,4 +187,5 @@ task main()
         break;
     }
   }
+
 }
