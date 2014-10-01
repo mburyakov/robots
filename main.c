@@ -9,9 +9,10 @@ long lastStepTime;
 /*
 states:
 
-1 - waiting
-2 - running route
-3 - cross
+1 - stopped
+2 - running right side
+3 - turning left
+4 - turning rigth
 */
 short state;
 
@@ -19,19 +20,21 @@ short state;
 long startTime;
 int dt;
 
-float errSum1;
-float errSum2;
 
-const int sumTraceS1 = 50.0;
-const int sumTraceS2 = 500.0;
-
+const float sumTraceS1 = 50.0;
+const float sumTraceS2 = 500.0;
 
 const int wallDist = 17;
 
-float sensCum1;
-float sensCum2;
+float rightCum1;
+float rightCum2;
+
+float headCum1;
+float headCum2;
+
 
 const float rightCriteria = 30;
+const float headCriteria = 7;
 
 
 void lineFollow()
@@ -43,24 +46,30 @@ void lineFollow()
 
     float ds = dt * speed;
 
-    sensCum1 = (sensCum1 * (sumTraceS1*log(ds)-1) + SensorValue[sensRight])/(sumTraceS1*log(ds));
-    sensCum2 = (sensCum2 * (sumTraceS2*log(ds)-1) + SensorValue[sensRight])/(sumTraceS2*log(ds));
+    rightCum1 = (rightCum1 * (sumTraceS1*log(ds)-1) + SensorValue[sensRight])/(sumTraceS1*log(ds));
+    rightCum2 = (rightCum2 * (sumTraceS2*log(ds)-1) + SensorValue[sensRight])/(sumTraceS2*log(ds));
 
-    int summary = (sensCum1>rightCriteria);
+    headCum1 = (headCum1 * (sumTraceS1*log(ds)-1) + SensorValue[sensHead])/(sumTraceS1*log(ds));
+    headCum2 = (headCum2 * (sumTraceS2*log(ds)-1) + SensorValue[sensHead])/(sumTraceS2*log(ds));
 
-    if (summary) {
-      state = 1;
+    int rightDoor = rightCum1 > rightCriteria;
+    int headWall = headCum1 < headCriteria;
+
+    if (rightDoor) {
+      state = 4;
+    }
+    if (headWall) {
+      state = 3;
     }
 
 
 		float err = - SensorValue[sensRight] +  wallDist;
-		errSum1 = - sensCum1 + wallDist;
-		errSum2 = - sensCum2 + wallDist;
-		//errSum2 = 0;
-		float corr = (err-0.0*errSum2)/30.0+0*(errSum1+0.0*errSum2)*(errSum1+0.0*errSum2)*(errSum1+0.0*errSum2)/10000.0;
+		float errSum1 = - rightCum1 + wallDist;
+		float errSum2 = - rightCum2 + wallDist;
+		float corr = (err+0.0*errSum2)/30.0+0*(errSum1+0.0*errSum2)*(errSum1+0.0*errSum2)*(errSum1+0.0*errSum2)/10000.0;
 		nxtDisplayTextLine(2, "corr = %f", corr);
-		nxtDisplayTextLine(3, "sensCum1 = %f", sensCum1);
-		nxtDisplayTextLine(4, "sensCum2 = %f", sensCum2);
+		nxtDisplayTextLine(3, "rightCum1 = %f", rightCum1);
+		nxtDisplayTextLine(4, "rightCum2 = %f", rightCum2);
 	  motor[motorB] = speed*(1+corr);
 	  motor[motorC] = speed*(1-corr);
 	  break;
@@ -84,8 +93,8 @@ void init() {
   startTime = nSysTime;
   lastStepTime = startTime;
   timeInc();
-  sensCum1 = SensorValue[sensRight];
-  sensCum2 = SensorValue[sensRight];
+  rightCum1 = SensorValue[sensRight];
+  rightCum2 = SensorValue[sensRight];
 }
 
 void printInt(word n)
