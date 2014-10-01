@@ -36,19 +36,34 @@ float headCum2;
 const float rightCriteria = 30;
 const float headCriteria = 15;
 
+int getRight() {
+  if (SensorValue [sensRight] > 200) {
+    return 0;
+  }
+  return SensorValue [sensRight];
+}
+
+int getHead() {
+  if (SensorValue [sensHead] > 200) {
+    return 0;
+  }
+  return SensorValue [sensHead];
+}
+
+
 void lineFollow()
 {
 
-    nxtDisplayTextLine(1, "r = %d", SensorValue[sensRight]);
-    nxtDisplayTextLine(2, "h = %d", SensorValue[sensHead]);
+    nxtDisplayTextLine(1, "r = %d", getRight());
+    nxtDisplayTextLine(2, "h = %d", getHead());
 
     float ds = dt * speed;
 
-    rightCum1 = (rightCum1 * (sumTraceS1*log(ds)-1) + SensorValue[sensRight])/(sumTraceS1*log(ds));
-    rightCum2 = (rightCum2 * (sumTraceS2*log(ds)-1) + SensorValue[sensRight])/(sumTraceS2*log(ds));
+    rightCum1 = (rightCum1 * (sumTraceS1*log(ds)-1) + getRight())/(sumTraceS1*log(ds));
+    rightCum2 = (rightCum2 * (sumTraceS2*log(ds)-1) + getRight())/(sumTraceS2*log(ds));
 
-    headCum1 = (headCum1 * (sumTraceS1*log(ds)-1) + SensorValue[sensHead])/(sumTraceS1*log(ds));
-    headCum2 = (headCum2 * (sumTraceS2*log(ds)-1) + SensorValue[sensHead])/(sumTraceS2*log(ds));
+    headCum1 = (headCum1 * (sumTraceS1*log(ds)-1) + getHead())/(sumTraceS1*log(ds));
+    headCum2 = (headCum2 * (sumTraceS2*log(ds)-1) + getHead())/(sumTraceS2*log(ds));
 
     int rightDoor = rightCum1 > rightCriteria;
     int headWall = headCum1 < headCriteria;
@@ -61,7 +76,7 @@ void lineFollow()
     }
 
 
-    float err = - SensorValue[sensRight] +  wallDist;
+    float err = - getRight() +  wallDist;
     float errSum1 = - rightCum1 + wallDist;
     float errSum2 = - rightCum2 + wallDist;
     float corr = (err-0.99*errSum1)/2.0+0*(errSum1+0.0*errSum2)*(errSum1+0.0*errSum2)*(errSum1+0.0*errSum2)/10000.0;
@@ -91,10 +106,10 @@ void init() {
   startTime = nSysTime;
   lastStepTime = startTime;
   timeInc();
-  rightCum1 = SensorValue[sensRight];
-  rightCum2 = SensorValue[sensRight];
-  headCum1 = SensorValue[sensHead];
-  headCum2 = SensorValue[sensHead];
+  rightCum1 = getRight();
+  rightCum2 = getRight();
+  headCum1 = getHead();
+  headCum2 = getHead();
 }
 
 void waitIdle() {
