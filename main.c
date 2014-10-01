@@ -46,7 +46,7 @@ void lineFollow()
     nxtDisplayTextLine(1, "r = %d", SensorValue[sensRight]);
     //break;
 
-    sensCum = (sensC * (sumTraceTime1*log(dt)-1) + err)/(sumTraceTime1*log(dt));
+    //sensCum = (sensCum * (sumTraceTime1*log(dt)-1) + err)/(sumTraceTime1*log(dt));
 
     int summary = (SensorValue[sensRight]>rightCriteria)
     //nxtDisplayTextLine(1, "%d", SensorRaw[lightLeft]-lightAsymmetryCross);
