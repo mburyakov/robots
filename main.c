@@ -84,6 +84,10 @@ void timeInc() {
 	lastStepTime += dt;
 }
 
+void waitIdle(){
+  while(nMotorRunState[motorB] != runStateIdle || nMotorRunState[motorC] != runStateIdle ){}
+}
+
 void printInt(word n)
 {
 	string s;
@@ -91,82 +95,144 @@ void printInt(word n)
 	nxtDisplayTextLine(1,s);
 }
 
-void turnDirection(int angle) {
-  switch (angle)
+void turnInstant(int angle){
+
+    switch (angle)
   {
-  	case 90:
-      motor[motorB] = 100;
-      motor[motorC] = 0;
-      wait1Msec(1300);
-      break;
-  	case -90:
+  case 90:
+  	  int a = 240;
+    	nMotorEncoder[motorB] = 0;
+    	nMotorEncoder[motorC] = 0;
+
+      nMotorEncoderTarget[motorB] = a;
+    	nMotorEncoderTarget[motorC] = a;
+    	motor[motorB] = -100;
       motor[motorC] = 100;
-      motor[motorB] = 0;
-      wait1Msec(1300);
+      waitIdle();
+      nxtDisplayString(1, "%d", nMotorEncoder[motorB]);
+      nxtDisplayString(2, "%d", nMotorEncoder[motorC]);
       break;
-  	case 100:
-      motor[motorB] = 100;
-      motor[motorC] = 0;
-      wait1Msec(1100);
-      break;
-  	case -100:
+  case 0:
+       int c = 100;
+     nMotorEncoder[motorB] = 0;
+    	nMotorEncoder[motorC] = 0;
+
+      nMotorEncoderTarget[motorB] = c;
+    	nMotorEncoderTarget[motorC] = c;
+    	motor[motorB] = 100;
       motor[motorC] = 100;
-      motor[motorB] = 0;
-      wait1Msec(1100);
+      waitIdle();
+      nxtDisplayString(1, "%d", nMotorEncoder[motorB]);
+      nxtDisplayString(2, "%d", nMotorEncoder[motorC]);
       break;
-  	case 60:
-      motor[motorB] = 100;
-      motor[motorC] = 0;
-      wait1Msec(700);
-      break;
-  	case -60:
+  case 180:
+      int b = 470;
+     nMotorEncoder[motorB] = 0;
+    	nMotorEncoder[motorC] = 0;
+
+      nMotorEncoderTarget[motorB] = b;
+    	nMotorEncoderTarget[motorC] = b;
+    	motor[motorB] = -100;
       motor[motorC] = 100;
-      motor[motorB] = 0;
-      wait1Msec(700);
+      waitIdle();
+      nxtDisplayString(1, "%d", nMotorEncoder[motorB]);
+      nxtDisplayString(2, "%d", nMotorEncoder[motorC]);
       break;
-    case 10:
-      motor[motorB] = 0;
-      motor[motorC] = 0;
-      //wait1Msec(1000);
-      motor[motorB] = 100;
-      motor[motorC] = 20;
-      wait1Msec(600);
-      motor[motorB] = 0;
-      motor[motorC] = 0;
-      //wait1Msec(1000);
-      motor[motorB] = 30;
-      motor[motorC] = 100;
-      wait1Msec(300);
-      motor[motorB] = 0;
-      motor[motorC] = 0;
-      //wait1Msec(1000);
-      break;
-    case -10:
-      motor[motorC] = 0;
-      motor[motorB] = 0;
-      //wait1Msec(1000);
-      motor[motorC] = 100;
-      motor[motorB] = 20;
-      wait1Msec(600);
-      motor[motorC] = 0;
-      motor[motorB] = 0;
-      //wait1Msec(1000);
-      motor[motorC] = 30;
-      motor[motorB] = 100;
-      wait1Msec(300);
-      motor[motorC] = 0;
-      motor[motorB] = 0;
-      //wait1Msec(1000);
-      break;
-    case 0:
-      motor[motorB] = 100;
-      motor[motorC] = 100;
-      wait1Msec(100);
+
+  case -90:
+  	  int d = 240;
+    	nMotorEncoder[motorB] = 0;
+    	nMotorEncoder[motorC] = 0;
+
+      nMotorEncoderTarget[motorB] = d;
+    	nMotorEncoderTarget[motorC] = d;
+    	motor[motorB] = 100;
+      motor[motorC] = -100;
+      waitIdle();
+      nxtDisplayString(1, "%d", nMotorEncoder[motorB]);
+      nxtDisplayString(2, "%d", nMotorEncoder[motorC]);
       break;
     default:
       //nothing here
   }
 }
+
+// void turnDirection(int angle) {
+  // switch (angle)
+  // {
+  	// case 90:
+      // motor[motorB] = 100;
+      // motor[motorC] = 0;
+      // wait1Msec(1300);
+      // break;
+  	// case -90:
+      // motor[motorC] = 100;
+      // motor[motorB] = 0;
+      // wait1Msec(1300);
+      // break;
+  	// case 100:
+      // motor[motorB] = 100;
+      // motor[motorC] = 0;
+      // wait1Msec(1100);
+      // break;
+  	// case -100:
+      // motor[motorC] = 100;
+      // motor[motorB] = 0;
+      // wait1Msec(1100);
+      // break;
+  	// case 60:
+      // motor[motorB] = 100;
+      // motor[motorC] = 0;
+      // wait1Msec(700);
+      // break;
+  	// case -60:
+      // motor[motorC] = 100;
+      // motor[motorB] = 0;
+      // wait1Msec(700);
+      // break;
+    // case 10:
+      // motor[motorB] = 0;
+      // motor[motorC] = 0;
+      // //wait1Msec(1000);
+      // motor[motorB] = 100;
+      // motor[motorC] = 20;
+      // wait1Msec(600);
+      // motor[motorB] = 0;
+      // motor[motorC] = 0;
+      // //wait1Msec(1000);
+      // motor[motorB] = 30;
+      // motor[motorC] = 100;
+      // wait1Msec(300);
+      // motor[motorB] = 0;
+      // motor[motorC] = 0;
+      // //wait1Msec(1000);
+      // break;
+    // case -10:
+      // motor[motorC] = 0;
+      // motor[motorB] = 0;
+      // //wait1Msec(1000);
+      // motor[motorC] = 100;
+      // motor[motorB] = 20;
+      // wait1Msec(600);
+      // motor[motorC] = 0;
+      // motor[motorB] = 0;
+      // //wait1Msec(1000);
+      // motor[motorC] = 30;
+      // motor[motorB] = 100;
+      // wait1Msec(300);
+      // motor[motorC] = 0;
+      // motor[motorB] = 0;
+      // //wait1Msec(1000);
+      // break;
+    // case 0:
+      // motor[motorB] = 100;
+      // motor[motorC] = 100;
+      // wait1Msec(100);
+      // break;
+    // default:
+      // //nothing here
+  // }
+// }
 
 void readData()
 {
@@ -218,6 +284,33 @@ task main()
 
   init();
 
+
+
+    turnInstant(0);
+    turnInstant(180);
+    turnInstant(0);
+    turnInstant(180);
+    turnInstant(0);
+    turnInstant(90);
+    turnInstant(0);
+    turnInstant(90);
+    turnInstant(0);
+    turnInstant(90);
+    turnInstant(0);
+    turnInstant(90);
+    turnInstant(0);
+    turnInstant(-90);
+    turnInstant(0);
+    turnInstant(-90);
+    turnInstant(0);
+    turnInstant(-90);
+    turnInstant(0);
+    turnInstant(-90);
+    turnInstant(0);
+
+
+
+
   /*while (true) {
     readData();
     nxtDisplayTextLine(1,"known = %d",routeIndex);
@@ -226,48 +319,48 @@ task main()
   }*/
 
 
-  while(true)                           // Infinite loop
-  {
-  	nxtDisplayTextLine(2,"state=%d",state);
-  	nxtDisplayTextLine(3,"i=%d",i);
-  	nxtDisplayTextLine(4,"ri=%d",routeIndex);
-    timeInc();
-    readData();
-    switch (state)
-    {
-      case 1:
-        motor[motorC] = 0;
-        motor[motorB] = 0;
-        if (routes[i+1])
-        {
-        	state = 3;
-        }
-        break;
-      case 2:
-        lineFollow();
-        break;
-      case 3:
-        int nextRoute;
-        /*do {
-          nextRoute = random[31];
-        } while (angleFromTo(route, nextRoute) == -1);*/
-        if (routes[i+1]) {
-        	i++;
-          nextRoute = routes[i];
-          nxtDisplayTextLine(2, "angle = %d", angleFromTo(route, nextRoute));
-          turnDirection(angleFromTo(route, nextRoute));
-          route = nextRoute;
-          nxtDisplayTextLine(1, "route = %d", route);
-          //motor[motorB]=0;
-          //motor[motorC]=0;
-          //wait1Msec(10000);
-          state = 2;
-        }
-        else
-        {
-        	state = 1;
-        }
-        break;
-    }
-  }
+  // while(true)                           // Infinite loop
+  // {
+  	// nxtDisplayTextLine(2,"state=%d",state);
+  	// nxtDisplayTextLine(3,"i=%d",i);
+  	// nxtDisplayTextLine(4,"ri=%d",routeIndex);
+    // timeInc();
+    // readData();
+    // switch (state)
+    // {
+      // case 1:
+        // motor[motorC] = 0;
+        // motor[motorB] = 0;
+        // if (routes[i+1])
+        // {
+        	// state = 3;
+        // }
+        // break;
+      // case 2:
+        // lineFollow();
+        // break;
+      // case 3:
+        // int nextRoute;
+        // /*do {
+          // nextRoute = random[31];
+        // } while (angleFromTo(route, nextRoute) == -1);*/
+        // if (routes[i+1]) {
+        	// i++;
+          // nextRoute = routes[i];
+          // nxtDisplayTextLine(2, "angle = %d", angleFromTo(route, nextRoute));
+          // turnDirection(angleFromTo(route, nextRoute));
+          // route = nextRoute;
+          // nxtDisplayTextLine(1, "route = %d", route);
+          // //motor[motorB]=0;
+          // //motor[motorC]=0;
+          // //wait1Msec(10000);
+          // state = 2;
+        // }
+        // else
+        // {
+        	// state = 1;
+        // }
+        // break;
+    // }
+  // }
 }
