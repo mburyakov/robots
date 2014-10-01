@@ -4,11 +4,6 @@
 
 const short speed = 30;
 
-
-int routeIndex;
-int nextRoute0;
-int nextRoute1;
-
 long lastStepTime;
 
 /*
@@ -20,7 +15,6 @@ states:
 */
 short state;
 
-int route;
 
 long startTime;
 int dt;
@@ -75,24 +69,6 @@ void lineFollow()
   }
 }
 
-int i;
-int routes[30] = {20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-//int routes[2] = {7,11};
-
-void init() {
-	i = 0;
-	routeIndex = 0;
-	nextRoute0 = routes[0];
-	nextRoute1 = 0;
-	route = routes[0];
-  state = 2;
-  wait1Msec(1000);
-  startTime = nSysTime;
-  lastStepTime = startTime;
-  sensCum1 = sensorValue[sensRight];
-  sensCum2 = sensorValue[sensRight];
-}
-
 void timeInc() {
 	if (nSysTime - lastStepTime<10)
 	{
@@ -102,6 +78,16 @@ void timeInc() {
 	lastStepTime += dt;
 }
 
+void init() {
+  state = 2;
+  wait1Msec(500);
+  startTime = nSysTime;
+  lastStepTime = startTime;
+  timeInc();
+  sensCum1 = SensorValue[sensRight];
+  sensCum2 = SensorValue[sensRight];
+}
+
 void printInt(word n)
 {
 	string s;
@@ -109,107 +95,18 @@ void printInt(word n)
 	nxtDisplayTextLine(1,s);
 }
 
-void turnDirection(int angle) {
-  switch (angle)
-  {
-  	case 90:
-      motor[motorB] = 100;
-      motor[motorC] = 0;
-      wait1Msec(1300);
-      break;
-  	case -90:
-      motor[motorC] = 100;
-      motor[motorB] = 0;
-      wait1Msec(1300);
-      break;
-  	case 100:
-      motor[motorB] = 100;
-      motor[motorC] = 0;
-      wait1Msec(1100);
-      break;
-  	case -100:
-      motor[motorC] = 100;
-      motor[motorB] = 0;
-      wait1Msec(1100);
-      break;
-  	case 60:
-      motor[motorB] = 100;
-      motor[motorC] = 0;
-      wait1Msec(700);
-      break;
-  	case -60:
-      motor[motorC] = 100;
-      motor[motorB] = 0;
-      wait1Msec(700);
-      break;
-    case 10:
-      motor[motorB] = 0;
-      motor[motorC] = 0;
-      //wait1Msec(1000);
-      motor[motorB] = 100;
-      motor[motorC] = 20;
-      wait1Msec(600);
-      motor[motorB] = 0;
-      motor[motorC] = 0;
-      //wait1Msec(1000);
-      motor[motorB] = 30;
-      motor[motorC] = 100;
-      wait1Msec(300);
-      motor[motorB] = 0;
-      motor[motorC] = 0;
-      //wait1Msec(1000);
-      break;
-    case -10:
-      motor[motorC] = 0;
-      motor[motorB] = 0;
-      //wait1Msec(1000);
-      motor[motorC] = 100;
-      motor[motorB] = 20;
-      wait1Msec(600);
-      motor[motorC] = 0;
-      motor[motorB] = 0;
-      //wait1Msec(1000);
-      motor[motorC] = 30;
-      motor[motorB] = 100;
-      wait1Msec(300);
-      motor[motorC] = 0;
-      motor[motorB] = 0;
-      //wait1Msec(1000);
-      break;
-    case 0:
-      motor[motorB] = 100;
-      motor[motorC] = 100;
-      wait1Msec(100);
-      break;
-    default:
-      //nothing here
-  }
-}
 
 task main()
 {
 
   init();
-
-  /*while (true) {
-    readData();
-    nxtDisplayTextLine(1,"known = %d",routeIndex);
-    nxtDisplayTextLine(2,"%d %d %d %d %d %d",routes[0],routes[1],routes[2],routes[3],routes[4],routes[5],routes[6]);
-    wait1Msec(10)
-  }*/
-
-  timeInc();
-  while(true)                           // Infinite loop
+  while(true)
   {
     switch (state)
     {
       case 1:
         motor[motorC] = 0;
         motor[motorB] = 0;
-        if (routes[i+1])
-        {
-        	state = 3;
-        }
         break;
       case 2:
         lineFollow();
