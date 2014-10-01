@@ -21,10 +21,10 @@ long startTime;
 int dt;
 
 
-const float sumTraceS1 = 50.0;
-const float sumTraceS2 = 500.0;
+const float sumTraceS1 = 10.0;
+const float sumTraceS2 = 100.0;
 
-const int wallDist = 17;
+const int wallDist = 12;
 
 float rightCum1;
 float rightCum2;
@@ -34,15 +34,13 @@ float headCum2;
 
 
 const float rightCriteria = 30;
-const float headCriteria = 7;
-
+const float headCriteria = 15;
 
 void lineFollow()
 {
-	switch (state) {
-  case 2:
 
     nxtDisplayTextLine(1, "r = %d", SensorValue[sensRight]);
+    nxtDisplayTextLine(2, "h = %d", SensorValue[sensHead]);
 
     float ds = dt * speed;
 
@@ -63,110 +61,104 @@ void lineFollow()
     }
 
 
-		float err = - SensorValue[sensRight] +  wallDist;
-		float errSum1 = - rightCum1 + wallDist;
-		float errSum2 = - rightCum2 + wallDist;
-		float corr = (err+0.0*errSum2)/30.0+0*(errSum1+0.0*errSum2)*(errSum1+0.0*errSum2)*(errSum1+0.0*errSum2)/10000.0;
-		nxtDisplayTextLine(2, "corr = %f", corr);
-		nxtDisplayTextLine(3, "rightCum1 = %f", rightCum1);
-		nxtDisplayTextLine(4, "rightCum2 = %f", rightCum2);
-	  motor[motorB] = speed*(1+corr);
-	  motor[motorC] = speed*(1-corr);
-	  break;
-	default:
-	  //should not be in this state
-  }
+    float err = - SensorValue[sensRight] +  wallDist;
+    float errSum1 = - rightCum1 + wallDist;
+    float errSum2 = - rightCum2 + wallDist;
+    float corr = (err-0.99*errSum1)/2.0+0*(errSum1+0.0*errSum2)*(errSum1+0.0*errSum2)*(errSum1+0.0*errSum2)/10000.0;
+    if (abs(corr)>0.2) {
+      corr = corr / abs(corr) * 0.2;
+    }
+    //nxtDisplayTextLine(2, "corr = %f", corr);
+    //nxtDisplayTextLine(3, "rightCum1 = %f", rightCum1);
+    //nxtDisplayTextLine(4, "rightCum2 = %f", rightCum2);
+    if (lastStepTime - startTime > 100) {
+      motor[motorB] = speed*(1+corr);
+      motor[motorC] = speed*(1-corr);
+    }
 }
 
 void timeInc() {
-	if (nSysTime - lastStepTime<10)
-	{
-		wait1Msec(10);
-	}
-	dt = nSysTime - lastStepTime;
-	lastStepTime += dt;
+  if (nSysTime - lastStepTime<10)
+  {
+    wait1Msec(10);
+  }
+  dt = nSysTime - lastStepTime;
+  lastStepTime += dt;
 }
 
 void init() {
   state = 2;
-  wait1Msec(500);
   startTime = nSysTime;
   lastStepTime = startTime;
   timeInc();
   rightCum1 = SensorValue[sensRight];
   rightCum2 = SensorValue[sensRight];
+  headCum1 = SensorValue[sensHead];
+  headCum2 = SensorValue[sensHead];
 }
 
-void waitIdle(){
+void waitIdle() {
   while(nMotorRunState[motorB] != runStateIdle || nMotorRunState[motorC] != runStateIdle ){}
 }
 
 void printInt(word n)
 {
-	string s;
-	StringFormat(s, "%d", n);
-	nxtDisplayTextLine(1,s);
+  string s;
+  StringFormat(s, "%d", n);
+  nxtDisplayTextLine(1,s);
 }
 
+void straight(int dist) {
+    nMotorEncoder[motorB] = 0;
+    nMotorEncoder[motorC] = 0;
+
+    nMotorEncoderTarget[motorB] = dist;
+    nMotorEncoderTarget[motorC] = dist;
+    motor[motorB] = 100;
+    motor[motorC] = 100;
+    waitIdle();
+    nxtDisplayString(1, "%d", nMotorEncoder[motorB]);
+    nxtDisplayString(2, "%d", nMotorEncoder[motorC]);
+
+  }
+
+void sleep() {
+    motor[motorB] = 0;
+    motor[motorC] = 0;
+    wait1Msec(1000);
+  }
+
+
 void turnInstant(int angle){
-
-    switch (angle)
-  {
-  case 90:
-  	  int a = 240;
-    	nMotorEncoder[motorB] = 0;
-    	nMotorEncoder[motorC] = 0;
-
-      nMotorEncoderTarget[motorB] = a;
-    	nMotorEncoderTarget[motorC] = a;
-    	motor[motorB] = -100;
-      motor[motorC] = 100;
-      waitIdle();
-      nxtDisplayString(1, "%d", nMotorEncoder[motorB]);
-      nxtDisplayString(2, "%d", nMotorEncoder[motorC]);
-      break;
-  case 0:
-       int c = 100;
-     nMotorEncoder[motorB] = 0;
-    	nMotorEncoder[motorC] = 0;
-
-      nMotorEncoderTarget[motorB] = c;
-    	nMotorEncoderTarget[motorC] = c;
-    	motor[motorB] = 100;
-      motor[motorC] = 100;
-      waitIdle();
-      nxtDisplayString(1, "%d", nMotorEncoder[motorB]);
-      nxtDisplayString(2, "%d", nMotorEncoder[motorC]);
-      break;
-  case 180:
+  switch (angle) {
+    case 180:
       int b = 470;
-     nMotorEncoder[motorB] = 0;
-    	nMotorEncoder[motorC] = 0;
+      nMotorEncoder[motorB] = 0;
+      nMotorEncoder[motorC] = 0;
 
       nMotorEncoderTarget[motorB] = b;
-    	nMotorEncoderTarget[motorC] = b;
-    	motor[motorB] = -100;
+      nMotorEncoderTarget[motorC] = b;
+      motor[motorB] = -100;
       motor[motorC] = 100;
-      waitIdle();
-      nxtDisplayString(1, "%d", nMotorEncoder[motorB]);
-      nxtDisplayString(2, "%d", nMotorEncoder[motorC]);
-      break;
-
-  case -90:
-  	  int d = 240;
-    	nMotorEncoder[motorB] = 0;
-    	nMotorEncoder[motorC] = 0;
-
-      nMotorEncoderTarget[motorB] = d;
-    	nMotorEncoderTarget[motorC] = d;
-    	motor[motorB] = 100;
-      motor[motorC] = -100;
       waitIdle();
       nxtDisplayString(1, "%d", nMotorEncoder[motorB]);
       nxtDisplayString(2, "%d", nMotorEncoder[motorC]);
       break;
     default:
-      //nothing here
+      int a = - angle*(8.0/3.0);
+      int sign = a >= 0 ? 1 : -1;
+      nMotorEncoder[motorB] = 0;
+      nMotorEncoder[motorC] = 0;
+
+      nMotorEncoderTarget[motorB] = a;
+      nMotorEncoderTarget[motorC] = a;
+      motor[motorB] = sign * 100;
+      motor[motorC] = - sign * 100;
+      waitIdle();
+      nxtDisplayString(1, "%d", nMotorEncoder[motorB]);
+      nxtDisplayString(2, "%d", nMotorEncoder[motorC]);
+      break;
+
   }
 }
 
@@ -174,6 +166,12 @@ task main()
 {
 
   init();
+
+  //turnInstant(90);
+  //sleep();
+  //turnInstant(-90);
+  //sleep();
+  //return;
   while(true)
   {
     switch (state)
@@ -184,7 +182,26 @@ task main()
         break;
       case 2:
         lineFollow();
+        timeInc();
         break;
+      case 3:
+        sleep();
+        turnInstant(-90);
+        sleep();
+        init();
+        break;
+      case 4:
+        sleep();
+        straight(300);
+        sleep();
+        turnInstant(90);
+        sleep();
+        straight(500);
+        sleep();
+        init();
+        break;
+      default:
+        //nothing there
     }
   }
 
