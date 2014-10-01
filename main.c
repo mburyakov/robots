@@ -33,7 +33,7 @@ float errSum2;
 
 const int wallDist = 17;
 
-const float sensCum;
+float sensCum;
 
 
 
