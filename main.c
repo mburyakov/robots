@@ -163,20 +163,40 @@ void findWall()
 
 void turnInstant(int angle){
   switch (angle) {
-    case 180:
-      int b = 470;
+    case 90:
+    {
+      int a = - angle*(2.4);
+      int sign = a >= 0 ? 1 : -1;
       nMotorEncoder[motorB] = 0;
       nMotorEncoder[motorC] = 0;
 
-      nMotorEncoderTarget[motorB] = b;
-      nMotorEncoderTarget[motorC] = b;
-      motor[motorB] = -100;
-      motor[motorC] = 100;
+      nMotorEncoderTarget[motorB] = a;
+      nMotorEncoderTarget[motorC] = a;
+      motor[motorB] = sign * speed;
+      motor[motorC] = - sign * speed;
       waitIdle();
       //nxtDisplayString(1, "%d", nMotorEncoder[motorB]);
       //nxtDisplayString(2, "%d", nMotorEncoder[motorC]);
       break;
+    }
+    case -90:
+    {
+      int a = - angle*(2.5);
+      int sign = a >= 0 ? 1 : -1;
+      nMotorEncoder[motorB] = 0;
+      nMotorEncoder[motorC] = 0;
+
+      nMotorEncoderTarget[motorB] = a;
+      nMotorEncoderTarget[motorC] = a;
+      motor[motorB] = sign * speed;
+      motor[motorC] = - sign * speed;
+      waitIdle();
+      //nxtDisplayString(1, "%d", nMotorEncoder[motorB]);
+      //nxtDisplayString(2, "%d", nMotorEncoder[motorC]);
+    }
+      break;
     default:
+    {
       int a = - angle*(2.5);
       int sign = a >= 0 ? 1 : -1;
       nMotorEncoder[motorB] = 0;
@@ -190,7 +210,7 @@ void turnInstant(int angle){
       //nxtDisplayString(1, "%d", nMotorEncoder[motorB]);
       //nxtDisplayString(2, "%d", nMotorEncoder[motorC]);
       break;
-
+    }
   }
 }
 
