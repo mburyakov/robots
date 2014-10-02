@@ -4,8 +4,9 @@
 
 #include "graph.c"
 
-const short speed = 80;
+const short speed = 100;
 
+const int robotN = 0;
 
 int routeIndex;
 int nextRoute0;
@@ -29,9 +30,9 @@ int dt;
 float errSum1;
 const int sumTraceTime1 = 10.0;
 float errSum2;
-const int grayCriteria = 500;
-const int lightAsymmetryCorr = 30;
-const int lightAsymmetryCross = -40;
+const int grayCriteria = 600;
+const int lightAsymmetryCorr = 0;
+const int lightAsymmetryCross = 0;
 void lineFollow()
 {
 	switch (state) {
@@ -50,7 +51,7 @@ void lineFollow()
 		errSum1 = (errSum1 * (sumTraceTime1*log(dt)-1) + err)/(sumTraceTime1*log(dt));
 		errSum2 += err*dt;
 		errSum2 = 0;
-		float corr = (err+0*errSum2)/100.0+0*(errSum1+0.0*errSum2)*(errSum1+0.0*errSum2)*(errSum1+0.0*errSum2)/80000.0;
+		float corr = (err+0*errSum2)/200.0+0*(err+0.0*errSum2)*(err+0.0*errSum2)*(err+0.0*errSum2)/80000.0;
 	  motor[motorB] = speed*(1+corr);
 	  motor[motorC] = speed*(1-corr);
 	  break;
@@ -60,8 +61,8 @@ void lineFollow()
 }
 
 int i;
-int routes[30] = {20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-//int routes[2] = {7,11};
+//int routes[30] = {20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+int routes[14] = {16,20,17,8,3,9,13,25,28,21,20,19,23,0};
 
 void init() {
 	i = 0;
@@ -91,77 +92,116 @@ void printInt(word n)
 	nxtDisplayTextLine(1,s);
 }
 
+void waitIdle() {
+  while(nMotorRunState[motorB] != runStateIdle || nMotorRunState[motorC] != runStateIdle ){}
+}
+
+void sleep() {
+    motor[motorB] = 0;
+    motor[motorC] = 0;
+    wait1Msec(100);
+}
+
+
+void straight(int dist) {
+    nMotorEncoder[motorB] = 0;
+    nMotorEncoder[motorC] = 0;
+
+    nMotorEncoderTarget[motorB] = dist;
+    nMotorEncoderTarget[motorC] = dist;
+    motor[motorB] = 100;
+    motor[motorC] = 100;
+    waitIdle();
+    //nxtDisplayString(1, "%d", nMotorEncoder[motorB]);
+    //nxtDisplayString(2, "%d", nMotorEncoder[motorC]);
+
+  }
+
 void turnDirection(int angle) {
+  motor[motorB] = 0;
+  motor[motorC] = 0;
   switch (angle)
   {
   	case 90:
+  	  nMotorEncoder[motorB] = 0;
+  	  nMotorEncoder[motorC] = 0;
+  	  nMotorEncoderTarget[motorB] = 350;
+  	  nMotorEncoderTarget[motorC] = 15;
       motor[motorB] = 100;
-      motor[motorC] = 0;
-      wait1Msec(1300);
+      motor[motorC] = 7;
+      waitIdle();
       break;
   	case -90:
+  	  nMotorEncoder[motorB] = 0;
+  	  nMotorEncoder[motorC] = 0;
+  	  nMotorEncoderTarget[motorB] = 15;
+  	  nMotorEncoderTarget[motorC] = 350;
+      motor[motorB] = 7;
       motor[motorC] = 100;
-      motor[motorB] = 0;
-      wait1Msec(1300);
+      waitIdle();
       break;
   	case 100:
+  	  nMotorEncoder[motorB] = 0;
+  	  nMotorEncoder[motorC] = 0;
+  	  nMotorEncoderTarget[motorB] = 350;
+  	  nMotorEncoderTarget[motorC] = 15;
       motor[motorB] = 100;
-      motor[motorC] = 0;
-      wait1Msec(1100);
+      motor[motorC] = 7;
+      waitIdle();
       break;
   	case -100:
+  	  nMotorEncoder[motorB] = 0;
+  	  nMotorEncoder[motorC] = 0;
+  	  nMotorEncoderTarget[motorB] = 15;
+  	  nMotorEncoderTarget[motorC] = 350;
+      motor[motorB] = 7;
       motor[motorC] = 100;
-      motor[motorB] = 0;
-      wait1Msec(1100);
+      waitIdle();
       break;
   	case 60:
+  	  nMotorEncoder[motorB] = 0;
+  	  nMotorEncoder[motorC] = 0;
+  	  nMotorEncoderTarget[motorB] = 250;
+  	  nMotorEncoderTarget[motorC] = 15;
       motor[motorB] = 100;
-      motor[motorC] = 0;
-      wait1Msec(700);
+      motor[motorC] = 7;
+      waitIdle();
       break;
   	case -60:
+  	  nMotorEncoder[motorB] = 0;
+  	  nMotorEncoder[motorC] = 0;
+  	  nMotorEncoderTarget[motorB] = 15;
+  	  nMotorEncoderTarget[motorC] = 250;
+      motor[motorB] = 7;
       motor[motorC] = 100;
-      motor[motorB] = 0;
-      wait1Msec(700);
+      waitIdle();
       break;
     case 10:
-      motor[motorB] = 0;
-      motor[motorC] = 0;
-      //wait1Msec(1000);
+  	  nMotorEncoder[motorB] = 0;
+  	  nMotorEncoder[motorC] = 0;
+  	  nMotorEncoderTarget[motorB] = 50;
+  	  nMotorEncoderTarget[motorC] = 10;
       motor[motorB] = 100;
       motor[motorC] = 20;
-      wait1Msec(600);
-      motor[motorB] = 0;
-      motor[motorC] = 0;
-      //wait1Msec(1000);
-      motor[motorB] = 30;
-      motor[motorC] = 100;
-      wait1Msec(300);
-      motor[motorB] = 0;
-      motor[motorC] = 0;
-      //wait1Msec(1000);
+      waitIdle();
       break;
     case -10:
-      motor[motorC] = 0;
-      motor[motorB] = 0;
-      //wait1Msec(1000);
-      motor[motorC] = 100;
+  	  nMotorEncoder[motorB] = 0;
+  	  nMotorEncoder[motorC] = 0;
+  	  nMotorEncoderTarget[motorB] = 10;
+  	  nMotorEncoderTarget[motorC] = 50;
       motor[motorB] = 20;
-      wait1Msec(600);
-      motor[motorC] = 0;
-      motor[motorB] = 0;
-      //wait1Msec(1000);
-      motor[motorC] = 30;
-      motor[motorB] = 100;
-      wait1Msec(300);
-      motor[motorC] = 0;
-      motor[motorB] = 0;
-      //wait1Msec(1000);
+      motor[motorC] = 100;
+      waitIdle();
       break;
     case 0:
+  	  nMotorEncoder[motorB] = 0;
+  	  nMotorEncoder[motorC] = 0;
+  	  nMotorEncoderTarget[motorB] = 100;
+  	  nMotorEncoderTarget[motorC] = 100;
       motor[motorB] = 100;
       motor[motorC] = 100;
-      wait1Msec(100);
+      waitIdle();
       break;
     default:
       //nothing here
@@ -218,6 +258,11 @@ task main()
 
   init();
 
+  //while (true) {
+  //  nxtDisplayTextLine(1,"l = %d",SensorRaw[lightLeft]);
+  //  nxtDisplayTextLine(2,"r = %d",SensorRaw[lightRight]);
+ // }
+
   /*while (true) {
     readData();
     nxtDisplayTextLine(1,"known = %d",routeIndex);
@@ -232,7 +277,7 @@ task main()
   	nxtDisplayTextLine(3,"i=%d",i);
   	nxtDisplayTextLine(4,"ri=%d",routeIndex);
     timeInc();
-    readData();
+    //readData();
     switch (state)
     {
       case 1:
@@ -258,9 +303,9 @@ task main()
           turnDirection(angleFromTo(route, nextRoute));
           route = nextRoute;
           nxtDisplayTextLine(1, "route = %d", route);
-          //motor[motorB]=0;
-          //motor[motorC]=0;
-          //wait1Msec(10000);
+          motor[motorB]=0;
+          motor[motorC]=0;
+          //sleep();
           state = 2;
         }
         else
