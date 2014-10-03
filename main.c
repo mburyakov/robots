@@ -4,9 +4,9 @@
 
 #include "graph.c"
 
-const short speed = 90;
+const short speed = 50;
 
-const int robotN = 2;
+const int robotN = 1;
 const int master = 2 - robotN;
 
 int routeIndex;
@@ -34,7 +34,7 @@ float errSum2;
 const int grayCriteria = 600;
 
 const int lightLeftCorr = robotN == 1 ? 4 : -75;
-const int lightRightCorr = robotN == 1 ? -13 : 60;
+const int lightRightCorr = robotN == 1 ? -13 : 47;
 
 void lineFollow()
 {
@@ -42,9 +42,9 @@ void lineFollow()
   case 2:
 
     int summary = (SensorRaw[lightLeft]-lightLeftCorr>grayCriteria) || (SensorRaw[lightRight]>grayCriteria);
-    //nxtDisplayTextLine(1, "%d", SensorRaw[lightLeft]-lightAsymmetryCross);
-    //nxtDisplayTextLine(2, "%d", SensorRaw[lightRight]);
-    //nxtDisplayTextLine(3, "%d || %d = %d ", SensorRaw[lightLeft]-lightAsymmetryCross>grayCriteria, SensorRaw[lightRight]>grayCriteria, summary);
+    ////nxtDisplayTextLine(1, "%d", SensorRaw[lightLeft]-lightAsymmetryCross);
+    ////nxtDisplayTextLine(2, "%d", SensorRaw[lightRight]);
+    ////nxtDisplayTextLine(3, "%d || %d = %d ", SensorRaw[lightLeft]-lightAsymmetryCross>grayCriteria, SensorRaw[lightRight]>grayCriteria, summary);
     if (!summary) {
       state = 3;
     }
@@ -54,7 +54,7 @@ void lineFollow()
 		errSum1 = (errSum1 * (sumTraceTime1*log(dt)-1) + err)/(sumTraceTime1*log(dt));
 		errSum2 += err*dt;
 		errSum2 = 0;
-		float corr = (err+0*errSum1)/250.0+0*(err+0.0*errSum2)*(err+0.0*errSum2)*(err+0.0*errSum2)/80000.0;
+		float corr = (err+0*errSum1)/200.0+0*(err+0.0*errSum2)*(err+0.0*errSum2)*(err+0.0*errSum2)/80000.0;
 	  motor[motorB] = speed*(1+corr);
 	  motor[motorC] = speed*(1-corr);
 	  break;
@@ -67,18 +67,25 @@ int i;
 //int routes[30] = {20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 
-int routesMaster[30] = {13, 25, 28, 17, 8, 3,   9,         0,0,0,    0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0};
-int routesSlave[30]  = {16, 7,  2,  8, 17, 21, 27, 24, 19,     0,    0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0};
+int routesMaster[30] = {13, 25, 28, 21, 17,  8,  3,  9,         0,0,    0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0};
+int routesSlave[30]  = {12, 7,  2,  8,  12, 16, 19, 24, 27, 21, 17,     0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0};
 
 int routes[30] = {0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0};
 
 int overlapMaster;
 int overlapSlave;
-int slaveWaiting;
 int slaveBlocking;
 
-int overlapsMaster[6] = {14, 2, 0, 0, 0, 0};
-int overlapsSlave[6] = {3, 25, 0, 0, 0, 0};
+int overlapsMaster[6] = {17, 3, 28, 8, 0, 0};
+int overlapsSlave[6] = {2, 12, 27, 12, 0, 0};
+
+void skipMessages() {
+  while (message != 0) {
+    nxtDisplayTextLine(6, "skippig");
+    ClearMessage();
+  }
+}
+
 
 void init() {
   for (int i = 0; i<30; i++) {
@@ -88,9 +95,9 @@ void init() {
       routes[i] = routesSlave[i];
     }
   }
+  skipMessages();
   overlapMaster = -1;
   overlapSlave = -1;
-  slaveWaiting = 0;
   slaveBlocking = -1;
 	i = 0;
 	routeIndex = 0;
@@ -116,7 +123,7 @@ void printInt(word n)
 {
 	string s;
 	StringFormat(s, "%d", n);
-	nxtDisplayTextLine(1,s);
+	//nxtDisplayTextLine(1,s);
 }
 
 void waitIdle() {
@@ -206,18 +213,18 @@ void turnDirection(int angle) {
     case 10:
   	  nMotorEncoder[motorB] = 0;
   	  nMotorEncoder[motorC] = 0;
-  	  nMotorEncoderTarget[motorB] = 50;
-  	  nMotorEncoderTarget[motorC] = 10;
+  	  nMotorEncoderTarget[motorB] = 100;
+  	  nMotorEncoderTarget[motorC] = 20;
       motor[motorB] = 100;
-      motor[motorC] = 20;
+      motor[motorC] = 10;
       waitIdle();
       break;
     case -10:
   	  nMotorEncoder[motorB] = 0;
   	  nMotorEncoder[motorC] = 0;
   	  nMotorEncoderTarget[motorB] = 10;
-  	  nMotorEncoderTarget[motorC] = 50;
-      motor[motorB] = 20;
+  	  nMotorEncoderTarget[motorC] = 100;
+      motor[motorB] = 10;
       motor[motorC] = 100;
       waitIdle();
       break;
@@ -281,35 +288,31 @@ void readData()
 }
 
 void masterDo() {
-  nxtDisplayBigTextLine(6, "master");
   if (message == 0) { return; }
+  nxtDisplayTextLine(6, "RECEIVED");
   int msg = message;
   ClearMessage();
   for (int i = 0; i < 3; i++) {
     if (msg == overlapsSlave[2*i]) {
-      if (overlapMaster == 2*i) {
-        slaveWaiting = 1;
+      if (overlapMaster == i) {
         nxtDisplayTextLine(6, "deny %d", msg);
         return;
       } else {
-        slaveBlocking = msg;
-        sendMessage(1);
+        slaveBlocking = i;
+        sendMessage(msg);
         nxtDisplayTextLine(6, "allow %d", msg);
         return;
       }
     }
   }
 
+
   for (int i = 0; i < 3; i++) {
     if (msg == overlapsSlave[2*i+1]) {
-      if (overlapMaster == 2*i) {
-        assert();
-      } else {
-        slaveBlocking = -1;
-      }
+      slaveBlocking = -1;
     }
   }
-  sendMessage(1);
+  sendMessage(msg);
   nxtDisplayTextLine(6, "allow %d", msg);
 }
 
@@ -334,17 +337,17 @@ task main()
 
   /*while (true) {
     readData();
-    nxtDisplayTextLine(1,"known = %d",routeIndex);
-    nxtDisplayTextLine(2,"%d %d %d %d %d %d",routes[0],routes[1],routes[2],routes[3],routes[4],routes[5],routes[6]);
+    //nxtDisplayTextLine(1,"known = %d",routeIndex);
+    //nxtDisplayTextLine(2,"%d %d %d %d %d %d",routes[0],routes[1],routes[2],routes[3],routes[4],routes[5],routes[6]);
     wait1Msec(10)
   }*/
 
 
   while(true)                           // Infinite loop
   {
-  	nxtDisplayTextLine(2,"state=%d",state);
-  	nxtDisplayTextLine(3,"i=%d",i);
-  	nxtDisplayTextLine(4,"ri=%d",routeIndex);
+  	nxtDisplayTextLine(1,"ovMast %d",overlapMaster);
+  	nxtDisplayTextLine(2,"slBl %d",slaveBlocking);
+  	nxtDisplayTextLine(3,"ovSl",overlapSlave);
     timeInc();
     if (master) {
       masterDo();
@@ -370,15 +373,17 @@ task main()
         } while (angleFromTo(route, nextRoute) == -1);*/
         if (routes[i+1]) {
         	i++;
-          nextRoute = routes[i];
+        } else {
+          i = 0;
+        }
+        nextRoute = routes[i];
+          //nxtDisplayTextLine(5, "ol = %d", overlapMaster);
 
-          nxtDisplayTextLine(5, "ol = %d", overlapMaster);
 
-
-          nxtDisplayTextLine(2, "angle = %d", angleFromTo(route, nextRoute));
+          //nxtDisplayTextLine(2, "angle = %d", angleFromTo(route, nextRoute));
           turnDirection(angleFromTo(route, nextRoute));
           route = nextRoute;
-          nxtDisplayTextLine(1, "route = %d", route);
+          //nxtDisplayTextLine(1, "route = %d", route);
           motor[motorB]=0;
           motor[motorC]=0;
 
@@ -393,37 +398,29 @@ task main()
               for (int i = 0; i < 3; i++) {
                 if (nextRoute == overlapsMaster[2*i+1]) {
                   overlapMaster = -1;
-                  if (slaveWaiting) {
-                    sendMessage(1);
-                    slaveWaiting = 0;
-                  }
                 }
               }
             }
           }
 
           if (!master) {
-            sendMessage(nextRoute);
-            nxtDisplayString(6, "waiting");
-            while (!message == 1) {}
-            nxtDisplayString(6, "receive");
-            ClearMessage();
+            skipMessages();
+            while (message != nextRoute) {
+              skipMessages();
+              sendMessage(nextRoute);
+              nxtDisplayString(6, "wting %d", nextRoute);
+              wait1Msec(100);
+            }
+            nxtDisplayString(6, "recv %d", message);
           }
           if (master) {
-            if (slaveBlocking != -1) {
-              while (overlapsMaster[2*slaveBlocking] == nextRoute) {
-                masterDo();
-                wait1Msec(10);
-              }
+            while (slaveBlocking != -1 && slaveBlocking == overlapMaster) {
+              masterDo();
+              wait1Msec(10);
             }
           }
           //sleep();
           state = 2;
-        }
-        else
-        {
-        	state = 1;
-        }
         break;
     }
   }
