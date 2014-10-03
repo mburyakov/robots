@@ -6,7 +6,7 @@
 
 const short speed = 50;
 
-const int robotN = 1;
+const int robotN = 2;
 const int master = 2 - robotN;
 
 int routeIndex;
@@ -67,8 +67,8 @@ int i;
 //int routes[30] = {20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 
-int routesMaster[30] = {13, 25, 28, 21, 17,  8,  3,  9,         0,0,    0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0};
-int routesSlave[30]  = {12, 7,  2,  8,  12, 16, 19, 24, 27, 21, 17,     0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0};
+int routesMaster[30] = {13, 25, 28, 21, 17, 8,  3,  9,         0,0,  0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0};
+int routesSlave[30]  = {16, 7,  2,  8, 17, 21, 27, 24, 19,     0,    0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0};
 
 int routes[30] = {0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0};
 
@@ -76,8 +76,8 @@ int overlapMaster;
 int overlapSlave;
 int slaveBlocking;
 
-int overlapsMaster[6] = {17, 3, 28, 8, 0, 0};
-int overlapsSlave[6] = {2, 12, 27, 12, 0, 0};
+int overlapsMaster[6] = {28, 3, 0, 0, 0, 0};
+int overlapsSlave[6] = {2, 27, 0, 0, 0, 0};
 
 void skipMessages() {
   while (message != 0) {
