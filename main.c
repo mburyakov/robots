@@ -4,10 +4,10 @@
 
 #include "graph.c"
 
-const short speed = 50;
-
-const int robotN = 2;
+const int robotN = 1;
 const int master = 2 - robotN;
+
+const short speed = master ? 50 : 25;
 
 int routeIndex;
 int nextRoute0;
