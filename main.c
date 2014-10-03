@@ -67,10 +67,10 @@ int i;
 //int routes[30] = {20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 
-int routesMaster[7] = {18, 14, 9, 3, 2, 7, 0};
-int routesSlave[14] = {16,20,17,8,3,9,13,25,28,21,20,19,23,0};
+int routesMaster[30] = {13, 25, 28, 17, 8, 3,   9,         0,0,0,    0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0};
+int routesSlave[30]  = {16, 7,  2,  8, 17, 21, 27, 24, 19,     0,    0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0};
 
-int routes[14] = {16,20,17,8,3,9,13,25,28,21,20,19,23,0};
+int routes[30] = {0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0};
 
 int overlapMaster;
 int overlapSlave;
@@ -81,6 +81,13 @@ int overlapsMaster[6] = {14, 2, 0, 0, 0, 0};
 int overlapsSlave[6] = {3, 25, 0, 0, 0, 0};
 
 void init() {
+  for (int i = 0; i<30; i++) {
+    if (master) {
+      routes[i] = routesMaster[i];
+    } else {
+      routes[i] = routesSlave[i];
+    }
+  }
   overlapMaster = -1;
   overlapSlave = -1;
   slaveWaiting = 0;
@@ -276,21 +283,25 @@ void readData()
 void masterDo() {
   nxtDisplayBigTextLine(6, "master");
   if (message == 0) { return; }
+  int msg = message;
+  ClearMessage();
   for (int i = 0; i < 3; i++) {
-    if (message == overlapsSlave[2*i]) {
+    if (msg == overlapsSlave[2*i]) {
       if (overlapMaster == 2*i) {
         slaveWaiting = 1;
+        nxtDisplayTextLine(6, "deny %d", msg);
         return;
       } else {
-        slaveBlocking = message;
+        slaveBlocking = msg;
         sendMessage(1);
+        nxtDisplayTextLine(6, "allow %d", msg);
         return;
       }
     }
   }
 
   for (int i = 0; i < 3; i++) {
-    if (message == overlapsSlave[2*i+1]) {
+    if (msg == overlapsSlave[2*i+1]) {
       if (overlapMaster == 2*i) {
         assert();
       } else {
@@ -299,10 +310,7 @@ void masterDo() {
     }
   }
   sendMessage(1);
-  nxtDisplayBigTextLine(6, "send");
-  //wait1Msec(5000);
-  nxtDisplayBigTextLine(6, "    ");
-  ClearMessage();
+  nxtDisplayTextLine(6, "allow %d", msg);
 }
 
 task main()
